@@ -1,16 +1,47 @@
 Ubigraph version 0.01
-=====================
+======================
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+Ubigraph is a Perl client interface for the UbiGraph software 
+(http://ubietylab.net/ubigraph/) with object-oriented abstraction
+over the XML-RPC calls. UbiGraph is a client-server software for
+3D visualization and layout of graph-theoretical network diagrams.
+This module hides the XML-RPC calls and allows visualization through
+object-oriented access to Vertex and Edge objects, similar to 
+Python and Ruby APIs.
 
-A README file is required for CPAN modules since CPAN extracts the
-README file from a module distribution so that people browsing the
-archive can use it get an idea of the modules uses. It is usually a
-good idea to provide version information here so that people can
-decide whether fixes for the module are worth downloading.
+For the details of the parameters, users should refer to the UbiGraph
+XML-RPC Manual (http://ubietylab.net/ubigraph/content/Docs/index.html).
+
+
+Example:
+
+    use Ubigraph;
+
+    my $u = new Ubigraph();
+
+    my $v1 = $u->Vertex();
+    my $v2 = $u->Vertex(shape=>"sphere");
+
+    my $e1 = $u->Edge($v1, $v2);
+
+    $v1->shape("torus");
+    $v1->size(3.5);
+
+    sleep(2);
+
+    $u->clear();
+
+    my @v;
+    for (0..100){
+        $v[$_] = $u->Vertex();
+    }
+
+    for (0..100){
+        $u->Edge($v[int(rand(100))], $v[int(rand(100))]);
+        select(undef, undef, undef, 0.05);
+    }
+
+
 
 INSTALLATION
 
@@ -25,16 +56,14 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  blah blah blah
+  Frontier::Client
 
 COPYRIGHT AND LICENCE
 
-Put the correct copyright and licence information here.
-
-Copyright (C) 2008 by Tizona
+Copyright (C) 2008 by Kazuharu Arakawa (gaou@sfc.keio.ac.jp)
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.8 or,
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
 at your option, any later version of Perl 5 you may have available.
 
 

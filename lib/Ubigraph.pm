@@ -1,279 +1,52 @@
 package Ubigraph;
 
-use 5.008008;
+use 5.006;
 use strict;
 use warnings;
 use Frontier::Client;
 
-my $url = 'http://127.0.0.1:20738/RPC2';
-my $client = Frontier::Client->new(url=>$url);
-$client->call('ubigraph.clear',0);
+use Ubigraph::Edge;
+use Ubigraph::Vertex;
+
+our $VERSION = '0.02';
+
+
+sub new {
+    my $pkg = shift;
+    my $url = shift || 'http://127.0.0.1:20738/RPC2';
+    my $this = {};
+    bless $this;
+
+    $this->{'client'} = Frontier::Client->new(url=>$url);
+    $this->clear();
+
+    return $this;
+}
+
 
 sub clear {
-    $client->call('ubigraph.clear');
-}
-
-### {{{ 'Ubigraph::Vertex' Class
-
-package Ubigraph::Vertex;
-
-sub new {
-    my $class = shift;
-    my $self = {vertex => $client->call('ubigraph.new_vertex')};
-    my @param = @_;
-    if ($#param > 0) {
-	for (0..($#param / 2)) {
-	    my $name = $param[2*$_];
-	    my $value = $param[2*$_+1];
-	    if ($name eq 'shapedetail' || $name eq 'label' || $name eq 'size' || $name eq 'fontsize') {
-		$client->call('ubigraph.set_vertex_attribute',$self->{vertex},$name,$value." ");
-	    } else {
-		$client->call('ubigraph.set_vertex_attribute',$self->{vertex},$name,$value);
-	    }
-	}
-    }
-    return bless $self,$class;
-}
-
-sub remove {
-    my $self = shift;
-    $client->call('ubigraph.remove_vertex',$self->{vertex});
-}
-
-sub color {
-    ## [default] "#0000ff"
-    my $self = shift;
-    my $color = shift;
-    $client->call('ubigraph.set_vertex_attribute',$self->{vertex},'color',$color);
-}
-
-sub shape {
-    ## [default] "cube" ("cone","cube","dodecahedron","icosahedron","octahedron","sphere","octahedron","torus")
-    my $self = shift;
-    my $shape = shift;
-    $client->call('ubigraph.set_vertex_attribute',$self->{vertex},'shape',$shape);
-}
-
-sub shapedetail {
-    ## [default] "10"
-    my $self = shift;
-    my $detail = shift;
-    $client->call('ubigraph.set_vertex_attribute',$self->{vertex},'shapedetail',$detail." ");
-}
-
-sub label {
-    ## [default] ""
-    my $self = shift;
-    my $label = shift;
-    $client->call('ubigraph.set_vertex_attribute',$self->{vertex},'label',$label." ");
-}
-
-sub size {
-    ## [defaulr] "1.0"
-    my $self = shift;
-    my $size = shift;
-    $client->call('ubigraph.set_vertex_attribute',$self->{vertex},'size',$size." ");
-}
-
-sub fontcolor {
-    ## [default] "#ffffff"
-    my $self = shift;
-    my $font_color = shift;
-    $client->call('ubigraph.set_vertex_attribute',$self->{vertex},'fontcolor',$font_color);
-}
-
-sub fontfamily {
-    ## [default] "Helvetica" ("Helvetica","Times Roman")
-    my $self = shift;
-    my $font_family = shift;
-    $client->call('ubigraph.set_vertex_attribute',$self->{vertex},'fontfamily',$font_family);
-}
-
-sub fontsize {
-    ## [default] "12"
-    my $self = shift;
-    my $font_size = shift;
-    $client->call('ubigraph.set_vertex_attribute',$self->{vertex},'fontsize',$font_size." ");
-}
-
-sub callback_left_doubleclick {
-    ## [default] "" (http://yourhostname.net/mothod_name)
-    my $self = shift;
-    my $double_click = shift;
-    $client->call('ubigraph.set_vertex_attribute',$self->{vertex},'callback_left_doubleclick',$double_click);
+    my $this = shift;
+    $this->{'client'}->call('ubigraph.clear', 0);
 }
 
 
-
-package Ubigraph::Edge;
-
-sub new {
-    my $class = shift;
-    my $vertex_a = shift;
-    my $vertex_b = shift;
-    my $self = {edge => $client->call('ubigraph.new_edge',$vertex_a->{vertex},$vertex_b->{vertex})};
-    my @param = @_;
-
-    if ($#param > 0) {
-	for (0..($#param / 2)) {
-	    my $name = $param[2*$_];
-	    my $value = $param[2*$_+1];
-	    if ($name eq 'arrow_position' || $name eq 'arrow_radius' || $name eq 'arrow_length' || $name eq 'label' || $name eq 'fontsize' || $name eq 'strength' || $name eq 'width') {
-		$client->call('ubigraph.set_edge_attribute',$self->{edge},$name,$value." ");
-	    } else {
-		$client->call('ubigraph.set_edge_attribute',$self->{edge},$name,$value);
-	    }
-	}
-    }
-    return bless $self,$class;
+sub Vertex{
+    return new Ubigraph::Vertex(@_);
 }
 
-sub remove {
-    my $self = shift;
-    $client->call('ubigraph.remove_edge',$self->{edge});
+sub newVertex{
+    return new Ubigraph::Vertex(@_);
 }
 
-sub arrow {
-    ## [default] "false" ("true"/"false")
-    my $self = shift;
-    my $arrow = shift;
-    $client->call('ubigraph.set_edge_attribute',$self->{edge},'arrow',$arrow);
+sub Edge{
+    return new Ubigraph::Edge(@_);
 }
 
-sub arrow_position {
-    ## [default] 0.5 (0.0 ~ 1.0)
-    my $self = shift;
-    my $arrow_position = shift;
-    $client->call('ubigraph.set_edge_attribute',$self->{edge},'arrow_position',$arrow_position." ");
+sub newEdge{
+    return new Ubigraph::Edge(@_);
 }
 
-sub arrow_radius {
-    ## [default] 1.0
-    my $self = shift;
-    my $arrow_radius = shift;
-    $client->call('ubigraph.set_edge_attribute',$self->{edge},'arrow_radius',$arrow_radius." ");
-}
-sub arrow_length {
-    ## [default] 1.0
-    my $self = shift;
-    my $arrow_length = shift;
-    $client->call('ubigraph.set_edge_attribute',$self->{edge},'arrow_length',$arrow_length." ");
-}
-sub arrow_reverse {
-    ## [default] "false" ("true"/"false")
-    my $self = shift;
-    my $arrow_reverse = shift;
-    $client->call('ubigraph.set_edge_attribute',$self->{edge},'arrow_reverse',$arrow_reverse);
-}
 
-sub color {
-    ## [default] "#0000ff"
-    my $self = shift;
-    my $color = shift;
-    $client->call('ubigraph.set_edge_attribute',$self->{edge},'color',$color);
-}
-
-sub label {
-    ## [default] ""
-    my $self = shift;
-    my $label = shift;
-    $client->call('ubigraph.set_edge_attribute',$self->{edge},'label',$label." ");
-}
-
-sub fontcolor {
-    ## [default] "#ffffff"
-    my $self = shift;
-    my $font_color = shift;
-    $client->call('ubigraph.set_edge_attribute',$self->{edge},'fontcolor',$font_color);
-}
-
-sub fontfamily {
-    ## [default] "Helvetica" ("Helvetica","Times Roman")
-    my $self = shift;
-    my $font_family = shift;
-    $client->call('ubigraph.set_edge_attribute',$self->{edge},'fontfamily',$font_family);
-}
-
-sub fontsize {
-    ## [default] "12"
-    my $self = shift;
-    my $font_size = shift;
-    $client->call('ubigraph.set_edge_attribute',$self->{edge},'fontsize',$font_size." ");
-}
-
-sub oriented {
-    ## [default] "false" ("true"/"false")
-    my $self = shift;
-    my $oriented = shift;
-    $client->call('ubigraph.set_edge_attribute',$self->{edge},'oriented',$oriented);
-}
-sub spline {
-    ## [default] "false" ("true"/"false")
-    my $self = shift;
-    my $spline = shift;
-    $client->call('ubigraph.set_edge_attribute',$self->{edge},'spline',$spline);
-}
-
-sub showstrain {
-    ## [default] "false" ("true"/"false")
-    my $self = shift;
-    my $showstrain = shift;
-    $client->call('ubigraph.set_edge_attribute',$self->{edge},'showstrain',$showstrain);
-}
-
-sub stroke {
-    ## [default] "solid" ("solid","dashed","dotted","none")
-    my $self = shift;
-    my $stroke = shift;
-    $client->call('ubigraph.set_edge_attribute',$self->{edge},'stroke',$stroke);
-}
-
-sub strength {
-    ## [default] 1.0
-    my $self = shift;
-    my $strength = shift;
-    $client->call('ubigraph.set_edge_attribute',$self->{edge},'strength',$strength." ");
-}
-
-sub visible {
-    ## [default] "true" ("true"/"false")
-    my $self = shift;
-    my $visible = shift;
-    $client->call('ubigraph.set_edge_attribute',$self->{edge},'visble',$visible);
-}
-
-sub width {
-    ## [default] "1.0"
-    my $self = shift;
-    my $width = shift;
-    $client->call('ubigraph.set_edge_attribute',$self->{edge},'width',$width." ");
-}
-
-require Exporter;
-
-our @ISA = qw(Exporter);
-
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
-
-# This allows declaration	use Ubigraph ':all';
-# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
-# will save memory.
-our %EXPORT_TAGS = ( 'all' => [ qw(
-	
-) ] );
-
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-our @EXPORT = qw(
-	
-);
-
-our $VERSION = '0.01';
-
-
-# Preloaded methods go here.
 
 1;
 __END__
@@ -281,45 +54,200 @@ __END__
 
 =head1 NAME
 
-Ubigraph - Perl extension for blah blah blah
+Ubigraph - Perl client of Ubigraph software
 
 =head1 SYNOPSIS
 
-  use Ubigraph;
-  blah blah blah
+    use Ubigraph;
+
+    my $u = new Ubigraph();
+
+    my $v1 = $u->Vertex();
+    my $v2 = $u->Vertex(shape=>"sphere");
+
+    my $e1 = $u->Edge($v1, $v2);
+
+    $v1->shape("torus");
+    $v1->size(3.5);
+
+    sleep(2);
+
+    $u->clear();
+
+    my @v;
+    for (0..100){
+        $v[$_] = $u->Vertex();
+    }
+
+    for (0..100){
+        $u->Edge($v[int(rand(100))], $v[int(rand(100))]);
+        select(undef, undef, undef, 0.05);
+    }
+
+
 
 =head1 DESCRIPTION
 
-Stub documentation for Ubigraph, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
-
-Blah blah blah.
+Ubigraph is a Perl client interface for the UbiGraph software 
+(http://ubietylab.net/ubigraph/) with object-oriented abstraction
+over the XML-RPC calls. UbiGraph is a client-server software for
+3D visualization and layout of graph-theoretical network diagrams.
+This module hides the XML-RPC calls and allows visualization through
+object-oriented access to Vertex and Edge objects, similar to 
+Python and Ruby APIs.
 
 =head2 EXPORT
 
 None by default.
 
+=head1 Ubigraph class
 
+=over 5
+
+=item B<$u = new Ubigraph()>
+
+=item B<$u = new Ubigraph($url)>
+
+=back
+
+The constructor of Ubigraph class starts the XML::RPC binding to Ubigraph server. Default url to bind is 'http://127.0.0.1:20738/RPC2'. 
+
+=over 5
+
+=item B<$u-E<gt>clear()>
+
+=back
+
+This method clears all entities.
+
+=over 5
+
+=item B<$vertex = $u-E<gt>Vertex()>
+
+=item B<$vertex = $u-E<gt>newVertex()>
+
+=item B<$vertex = $u-E<gt>Vertex(%parameters)>
+
+=item B<$vertex = $u-E<gt>newVertex(%parameters)>
+
+=back
+
+These class methods create a vertex (Ubigraph::Vertex instance), optionally with hash of parameters. 
+
+=over 5
+
+=item B<$edge = $u-E<gt>Edge($v1, $v2)>
+
+=item B<$edge = $u-E<gt>newEdge($v1, $v2)>
+
+=item B<$edge = $u-E<gt>Edge($v1, $v2, %parameters)>
+
+=item B<$edge = $u-E<gt>newEdge($v1, $v2, %parameters)>
+
+=back
+
+These class methods create an edge (Ubigraph::Edge instance), optionally with hash of parameters. 
+
+
+=head1 Ubigraph::Vertex class
+
+The following method removes the vertex.
+
+=over 5
+
+=item B<$vertex-E<gt>remove()>
+
+=back
+
+The following methods change the corresponding vertex parameters.
+
+=over 5
+
+=item B<$vertex-E<gt>color($color)>
+
+=item B<$vertex-E<gt>shape($shape)>
+
+=item B<$vertex-E<gt>shapedetail($shapedetail)>
+
+=item B<$vertex-E<gt>label($label)>
+
+=item B<$vertex-E<gt>size($size)>
+
+=item B<$vertex-E<gt>fontcolor($fontcolor)>
+
+=item B<$vertex-E<gt>fontfamily($fontfamily)>
+
+=item B<$vertex-E<gt>fontsize($fontsize)>
+
+=item B<$vertex-E<gt>callback_left_doubleclick($url)>
+
+=back
+
+
+=head1 Ubigraph::Edge class
+
+
+The following method removes the edge.
+
+=over 5
+
+=item B<$edge-E<gt>remove()>
+
+=back
+
+The following methods change the corresponding edge parameters.
+
+=over 5
+
+=item B<$edge-E<gt>arrow($arrow)>
+
+=item B<$edge-E<gt>arrow_position($arrow_position)>
+
+=item B<$edge-E<gt>arrow_radius($arrow_radius)>
+
+=item B<$edge-E<gt>arrow_length($arrow_length)>
+
+=item B<$edge-E<gt>arrow_reverse($arrow_reverse)>
+
+=item B<$edge-E<gt>color($color)>
+
+=item B<$edge-E<gt>label($label)>
+
+=item B<$edge-E<gt>fontcolor($fontcolor)>
+
+=item B<$edge-E<gt>fontfamily($fontfamily)>
+
+=item B<$edge-E<gt>fontsize($fontsize)>
+
+=item B<$edge-E<gt>oriented($oriented)>
+
+=item B<$edge-E<gt>spline($spline)>
+
+=item B<$edge-E<gt>showstrain($showstrain)>
+
+=item B<$edge-E<gt>stroke($stroke)>
+
+=item B<$edge-E<gt>strength($strength)>
+
+=item B<$edge-E<gt>visible($visible)>
+
+=item B<$edge-E<gt>width($width)>
+
+=back
 
 =head1 SEE ALSO
 
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
-
-If you have a mailing list set up for your module, mention it here.
-
-If you have a web site set up for your module, mention it here.
+For the details of the parameters, users should refer to the UbiGraph
+XML-RPC Manual (http://ubietylab.net/ubigraph/content/Docs/index.html).
 
 =head1 AUTHOR
 
-Tizona, E<lt>cory@bioinfo.sfc.keio.ac.jpE<gt>
+Kazuharu Arakawa E<lt>gaou@sfc.keio.ac.jpE<gt>
+Kazuki Oshita E<lt>cory@g-language.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008 by Tizona
+Copyright (C) 2008 by Kazuharu Arakawa
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

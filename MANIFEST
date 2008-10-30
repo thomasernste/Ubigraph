@@ -1,4 +1,5 @@
 Changes
+demo/demo.pl
 inc/Module/AutoInstall.pm
 inc/Module/Install.pm
 inc/Module/Install/AutoInstall.pm
@@ -11,7 +12,9 @@ inc/Module/Install/Metadata.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 lib/Ubigraph.pm
+lib/Ubigraph/Edge.pm
+lib/Ubigraph/Vertex.pm
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 README
 t/Ubigraph.t
