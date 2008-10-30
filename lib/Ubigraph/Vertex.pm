@@ -5,6 +5,8 @@ use strict;
 use warnings;
 use Frontier::Client;
 
+our $VERSION = '0.03';
+
 sub new {
     my $class = shift;
     my $ubigraph = shift;
