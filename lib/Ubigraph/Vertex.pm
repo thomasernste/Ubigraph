@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Frontier::Client;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub new {
     my $class = shift;
@@ -85,6 +85,13 @@ sub fontsize {
     my $self = shift;
     my $font_size = shift;
     $self->{client}->call('ubigraph.set_vertex_attribute',$self->{vertex},'fontsize',$font_size." ");
+}
+
+sub visible {
+    ## [default] "true" ("true"/"false")
+    my $self = shift;
+    my $visible = shift;
+    $self->{client}->call('ubigraph.set_vertex_attribute',$self->{vertex},'visble',$visible);
 }
 
 sub callback_left_doubleclick {

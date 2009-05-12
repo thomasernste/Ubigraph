@@ -8,7 +8,7 @@ use Frontier::Client;
 use Ubigraph::Edge;
 use Ubigraph::Vertex;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 
 sub new {
