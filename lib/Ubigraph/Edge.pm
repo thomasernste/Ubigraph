@@ -139,7 +139,7 @@ sub visible {
     ## [default] "true" ("true"/"false")
     my $self = shift;
     my $visible = shift;
-    $self->{client}->call('ubigraph.set_edge_attribute',$self->{edge},'visble',$visible);
+    $self->{client}->call('ubigraph.set_edge_attribute',$self->{edge},'visible',$visible);
 }
 
 sub width {

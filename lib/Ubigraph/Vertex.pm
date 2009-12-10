@@ -91,7 +91,7 @@ sub visible {
     ## [default] "true" ("true"/"false")
     my $self = shift;
     my $visible = shift;
-    $self->{client}->call('ubigraph.set_vertex_attribute',$self->{vertex},'visble',$visible);
+    $self->{client}->call('ubigraph.set_vertex_attribute',$self->{vertex},'visible',$visible);
 }
 
 sub callback_left_doubleclick {
